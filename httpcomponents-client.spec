@@ -7,7 +7,7 @@
 Name:              %{?scl_prefix}%{pkg_name}
 Summary:           HTTP agent implementation based on httpcomponents HttpCore
 Version:           4.2.5
-Release:           4.12%{?dist}
+Release:           4.13%{?dist}
 License:           ASL 2.0
 URL:               http://hc.apache.org/
 Source0:           http://archive.apache.org/dist/httpcomponents/httpclient/source/%{pkg_name}-%{version}-src.tar.gz
@@ -18,12 +18,12 @@ BuildArch:         noarch
 BuildRequires:     %{?scl_prefix_java_common}maven-local
 BuildRequires:     %{?scl_prefix_java_common}mvn(commons-codec:commons-codec)
 BuildRequires:     %{?scl_prefix_java_common}mvn(commons-logging:commons-logging)
-BuildRequires:     maven30-mvn(org.apache.httpcomponents:httpcore:4.2)
-BuildRequires:     maven30-mvn(org.apache.httpcomponents:project:pom:)
+BuildRequires:     %{?scl_prefix}mvn(org.apache.httpcomponents:httpcore:4.2)
+BuildRequires:     %{?scl_prefix}mvn(org.apache.httpcomponents:project:pom:)
 %if 0%{?fedora}
 # Test dependencies
-BuildRequires:     maven30-mvn(org.mockito:mockito-core)
-BuildRequires:     maven30-mvn(junit:junit)
+BuildRequires:     %{?scl_prefix}mvn(org.mockito:mockito-core)
+BuildRequires:     %{?scl_prefix}mvn(junit:junit)
 %endif
 
 %description
@@ -43,7 +43,7 @@ Summary:        API documentation for %{pkg_name}
 
 %prep
 %setup -q -n %{pkg_name}-%{version}
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 
 %patch0 -p1
@@ -111,7 +111,7 @@ done
 
 
 %build
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %mvn_file ":{*}" httpcomponents/@1
 
@@ -125,7 +125,7 @@ set -e -x
 
 
 %install
-%{?scl:scl enable maven30 %{scl} - <<"EOF"}
+%{?scl:scl enable %{scl} - <<"EOF"}
 set -e -x
 %mvn_install
 %{?scl:EOF}
@@ -139,6 +139,9 @@ set -e -x
 %doc LICENSE.txt NOTICE.txt
 
 %changelog
+* Mon Jan 11 2016 Michal Srb <msrb@redhat.com> - 4.2.5-4.13
+- maven33 rebuild #2
+
 * Sat Jan 09 2016 Michal Srb <msrb@redhat.com> - 4.2.5-4.12
 - maven33 rebuild
 
