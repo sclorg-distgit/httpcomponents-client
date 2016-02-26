@@ -7,7 +7,7 @@
 Name:              %{?scl_prefix}%{pkg_name}
 Summary:           HTTP agent implementation based on httpcomponents HttpCore
 Version:           4.2.5
-Release:           4.13%{?dist}
+Release:           4.14%{?dist}
 License:           ASL 2.0
 URL:               http://hc.apache.org/
 Source0:           http://archive.apache.org/dist/httpcomponents/httpclient/source/%{pkg_name}-%{version}-src.tar.gz
@@ -15,7 +15,7 @@ Patch0:            0001-Fix-CVE-2014-3577.patch
 
 BuildArch:         noarch
 
-BuildRequires:     %{?scl_prefix_java_common}maven-local
+BuildRequires:     %{?scl_prefix}maven-local
 BuildRequires:     %{?scl_prefix_java_common}mvn(commons-codec:commons-codec)
 BuildRequires:     %{?scl_prefix_java_common}mvn(commons-logging:commons-logging)
 BuildRequires:     %{?scl_prefix}mvn(org.apache.httpcomponents:httpcore:4.2)
@@ -139,6 +139,9 @@ set -e -x
 %doc LICENSE.txt NOTICE.txt
 
 %changelog
+* Mon Feb 08 2016 Michal Srb <msrb@redhat.com> - 4.2.5-4.14
+- Fix BR on maven-local & co.
+
 * Mon Jan 11 2016 Michal Srb <msrb@redhat.com> - 4.2.5-4.13
 - maven33 rebuild #2
 
