@@ -8,20 +8,19 @@
 Name:              %{?scl_prefix}httpcomponents-client
 Summary:           HTTP agent implementation based on httpcomponents HttpCore
 Version:           4.2.5
-Release:           3.6%{?dist}
+Release:           3.3%{?dist}
 Group:             Development/Libraries
 License:           ASL 2.0
 URL:               http://hc.apache.org/
 Source0:           http://archive.apache.org/dist/httpcomponents/httpclient/source/%{pkg_name}-%{version}-src.tar.gz
-Patch0:            0001-Fix-CVE-2014-3577.patch
 
 BuildArch:         noarch
 
-BuildRequires:     maven30-maven-local
-BuildRequires:     maven30-mvn(org.apache.httpcomponents:project)
+BuildRequires:     maven-local
 BuildRequires:     %{?scl_prefix}mvn(commons-codec:commons-codec)
 BuildRequires:     %{?scl_prefix}mvn(commons-logging:commons-logging)
 BuildRequires:     %{?scl_prefix}mvn(org.apache.httpcomponents:httpcore)
+BuildRequires:     mvn(org.apache.httpcomponents:project)
 %if 0%{?fedora}
 # Test dependencies
 BuildRequires:     mvn(org.mockito:mockito-core)
@@ -45,10 +44,8 @@ Group:          Documentation
 
 
 %prep
-%{?scl:scl enable maven30 %{scl} - << "EOF"}
+%{?scl:scl enable %{scl} - << "EOF"}
 %setup -q -n %{pkg_name}-%{version}
-
-%patch0 -p1
 
 # Remove optional build deps not available in Fedora
 %pom_disable_module httpclient-cache
@@ -109,7 +106,7 @@ done
 
 
 %build
-%{?scl:scl enable maven30 %{scl} - << "EOF"}
+%{?scl:scl enable %{scl} - << "EOF"}
 %mvn_file ":{*}" httpcomponents/@1
 
 # Build with tests enabled on Fedora
@@ -121,7 +118,7 @@ done
 %{?scl:EOF}
 
 %install
-%{?scl:scl enable maven30 %{scl} - << "EOF"}
+%{?scl:scl enable %{scl} - << "EOF"}
 %mvn_install
 %{?scl:EOF}
 
@@ -134,16 +131,6 @@ done
 %doc LICENSE.txt NOTICE.txt
 
 %changelog
-* Tue Aug 12 2014 Michal Srb <msrb@redhat.com> - 4.2.5-3.6
-- Fix MITM security vulnerability
-- Resolves: CVE-2014-3577
-
-* Wed Jun 18 2014 Severin Gehwolf <sgehwolf@redhat.com> - 4.2.5-3.5
-- Rebuild in order to fix auto-requires.
-
-* Tue Jun 17 2014 Severin Gehwolf <sgehwolf@redhat.com> - 4.2.5-3.4
-- Build against maven30 collection.
-
 * Mon Jan 20 2014 Omair Majid <omajid@redhat.com> - 4.2.5-3.3
 - Rebuild in order to fix osgi()-style provides.
 - Resolves: RHBZ#1054813
