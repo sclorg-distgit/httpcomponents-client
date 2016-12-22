@@ -7,7 +7,7 @@
 Name:              %{?scl_prefix}%{pkg_name}
 Summary:           HTTP agent implementation based on httpcomponents HttpCore
 Version:           4.3.6
-Release:           1.3%{?dist}
+Release:           1.4%{?dist}
 License:           ASL 2.0
 URL:               http://hc.apache.org/
 Source0:           http://archive.apache.org/dist/httpcomponents/httpclient/source/%{pkg_name}-%{version}-src.tar.gz
@@ -33,6 +33,12 @@ management. HttpComponents Client is a successor of and replacement
 for Commons HttpClient 3.x. Users of Commons HttpClient are strongly
 encouraged to upgrade.
 
+%package        cache
+Summary:        Cache module for %{name}
+
+%description    cache
+This package provides client side caching for %{name}.
+
 %package        javadoc
 Summary:        API documentation for %{pkg_name}
 
@@ -45,8 +51,13 @@ Summary:        API documentation for %{pkg_name}
 %{?scl:scl enable %{scl_maven} %{scl} - <<"EOF"}
 set -e -x
 
+# disable ehcache and memcached cache backends - we don't have the deps
+rm -r httpclient-cache/src/{main,test}/java/org/apache/http/impl/client/cache/{memcached,ehcache}
+%pom_remove_dep :spymemcached httpclient-cache
+%pom_remove_dep :ehcache-core httpclient-cache
+%pom_remove_dep :slf4j-jcl httpclient-cache
+
 # Remove optional build deps not available in Fedora
-%pom_disable_module httpclient-cache
 %pom_disable_module httpclient-osgi
 %pom_remove_plugin :maven-checkstyle-plugin
 %if !0%{?fedora}
@@ -55,7 +66,7 @@ set -e -x
 
 # Add proper Apache felix bundle plugin instructions
 # so that we get a reasonable OSGi manifest.
-for module in httpclient httpmime fluent-hc; do
+for module in httpclient httpmime httpclient-cache fluent-hc; do
     %pom_xpath_remove "pom:project/pom:packaging" $module
     %pom_xpath_inject "pom:project" "<packaging>bundle</packaging>" $module
 done
@@ -106,6 +117,25 @@ done
         <excludeDependencies>true</excludeDependencies>
       </configuration>
     </plugin>" httpclient
+
+# Make httpclient-cache into bundle
+# would need the following if ehcache or memcached backends are enabled:
+# <Import-Package>net.sf.ehcache;resolution:=optional,net.spy.memcached;resolution:=optional,*</Import-Package>
+%pom_xpath_inject pom:build/pom:plugins "
+    <plugin>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>maven-bundle-plugin</artifactId>
+      <extensions>true</extensions>
+      <configuration>
+        <instructions>
+          <Export-Package>*</Export-Package>
+          <Private-Package></Private-Package>
+          <_nouses>true</_nouses>
+        </instructions>
+        <excludeDependencies>true</excludeDependencies>
+      </configuration>
+    </plugin>" httpclient-cache
+
 %{?scl:EOF}
 
 
@@ -114,6 +144,8 @@ done
 %{?scl:scl enable %{scl_maven} %{scl} - <<"EOF"}
 set -e -x
 %mvn_file ":{*}" httpcomponents/@1
+
+%mvn_package :httpclient-cache cache
 
 # Build with tests enabled on Fedora
 %if 0%{?fedora}
@@ -135,10 +167,16 @@ set -e -x
 %doc LICENSE.txt NOTICE.txt
 %doc README.txt RELEASE_NOTES.txt
 
+%files cache -f .mfiles-cache
+
 %files javadoc -f .mfiles-javadoc
 %doc LICENSE.txt NOTICE.txt
 
 %changelog
+* Wed Nov 02 2016 Michael Simacek <msimacek@redhat.com> - 4.3.6-1.4
+- Enable httpclient-cache module
+- Resolves: rhbz#1390760
+
 * Mon Aug 01 2016 Mat Booth <mat.booth@redhat.com> - 4.3.6-1.3
 - Enable the fluent API module
 - Resolves: rhbz#1362261
