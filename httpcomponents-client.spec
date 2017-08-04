@@ -7,7 +7,7 @@
 Name:              %{?scl_prefix}httpcomponents-client
 Summary:           HTTP agent implementation based on httpcomponents HttpCore
 Version:           4.5.3
-Release:           3.1%{?dist}
+Release:           3.2%{?dist}
 License:           ASL 2.0
 URL:               http://hc.apache.org/
 Source0:           http://www.apache.org/dist/httpcomponents/httpclient/source/%{pkg_name}-%{version}-src.tar.gz
@@ -183,6 +183,9 @@ rm -r httpclient-cache/src/*/java/org/apache/http/impl/client/cache/ehcache
 %doc LICENSE.txt NOTICE.txt
 
 %changelog
+* Thu Jun 22 2017 Michael Simacek <msimacek@redhat.com> - 4.5.3-3.2
+- Mass rebuild 2017-06-22
+
 * Wed Jun 21 2017 Java Maintainers <java-maint@redhat.com> - 4.5.3-3.1
 - Automated package import and SCL-ization
 
